@@ -8,6 +8,6 @@ descriptor="tr($xpub/0/100)"
 
 descriptor_with_checksum=$(bitcoin-cli getdescriptorinfo "$descriptor" | jq -r '.descriptor')
 
-address=$(bitcoin-cli deriveaddresses "$descriptor_with_checksum")
+address=$(bitcoin-cli deriveaddresses "$descriptor_with_checksum" | jq -r '.[0]')
 
 echo $address
