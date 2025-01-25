@@ -2,25 +2,27 @@
 #   `37d966a263350fe747f1c606b159987545844a493dd38d84b070027a895c4517`
 
 #!/bin/bash
-#!/bin/bash
+set -e
+
 raw_tx=$(bitcoin-cli getrawtransaction 37d966a263350fe747f1c606b159987545844a493dd38d84b070027a895c4517 true)
 
 keys=()
 
 for i in $(echo "$raw_tx" | jq -r '.vin | keys[]'); do
-  key=$(echo "$raw_tx" | jq -r ".vin[$i].txinwitness[-1]")
-
-  if [[ $key =~ ^(02|03)[0-9a-fA-F]{64}$ ]]; then
-    keys+=("$key")
+  pubkey=$(echo "$raw_tx" | jq -r ".vin[$i].txinwitness[-1]")
+  
+  # Verifique se é uma chave pública válida
+  if [[ $pubkey =~ ^(02|03)[0-9a-fA-F]{64}$ ]]; then
+    keys+=("$pubkey")
   fi
 done
 
 if [ ${#keys[@]} -lt 4 ]; then
-  echo "Erro: Menos de 4 chaves públicas foram encontradas."
+  echo "Erro: Menos de 4 chaves públicas foram encontradas." >&2
   exit 1
 fi
 
-keys_json=$(printf '%s\n' "${keys[@]}" | jq -R -s -c 'split("\n")[:-1]')
+address=$(bitcoin-cli createmultisig 1 "$(printf '%s\n' "${keys[@]}" | jq -R -s -c 'split("\n")[:-1]')" | jq -r '.address')
 
-multisig=$(bitcoin-cli createmultisig 1 "$keys_json")
-echo $multisig
+echo $address
+
