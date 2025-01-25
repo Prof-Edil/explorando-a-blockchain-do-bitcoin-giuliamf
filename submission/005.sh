@@ -3,7 +3,7 @@
 
 #!/bin/bash
 #!/bin/bash
-raw_tx=$(bitcoin-core.cli getrawtransaction 37d966a263350fe747f1c606b159987545844a493dd38d84b070027a895c4517 true)
+raw_tx=$(bitcoin-cli getrawtransaction 37d966a263350fe747f1c606b159987545844a493dd38d84b070027a895c4517 true)
 
 keys=()
 
@@ -22,5 +22,5 @@ fi
 
 keys_json=$(printf '%s\n' "${keys[@]}" | jq -R -s -c 'split("\n")[:-1]')
 
-multisig=$(bitcoin-core.cli createmultisig 1 "$keys_json")
+multisig=$(bitcoin-cli createmultisig 1 "$keys_json")
 echo $multisig
