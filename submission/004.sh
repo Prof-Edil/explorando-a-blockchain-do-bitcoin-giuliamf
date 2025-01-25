@@ -4,10 +4,8 @@
 #!/bin/bash
 xpub="xpub6Cx5tvq6nACSLJdra1A6WjqTo1SgeUZRFqsX5ysEtVBMwhCCRa4kfgFqaT2o1kwL3esB1PsYr3CUdfRZYfLHJunNWUABKftK2NjHUtzDms2"
 
-descriptor="tr($xpub/100/100)"
+descriptor=$(bitcoin-cli getdescriptorinfo tr"($xpub/100)" | jq -r '.descriptor')
 
-descriptor_with_checksum=$(bitcoin-cli getdescriptorinfo "$descriptor" | jq -r '.descriptor')
-
-address=$(bitcoin-cli deriveaddresses "$descriptor_with_checksum" | jq -r '.[0]')
+address=$(bitcoin-cli deriveaddresses "$descriptor" | jq -r '.[0]')
 
 echo $address
